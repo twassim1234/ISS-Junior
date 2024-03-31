@@ -65,11 +65,30 @@ const LoginPage = () => {
   })
 
   // ** Hook
+  const [rememberMe, setRememberMe] = useState(false);
+
   const theme = useTheme()
   const router = useRouter()
 
+  useEffect(() => {
+    // Retrieve stored email and "Remember Me" state from local storage
+    const storedEmail = localStorage.getItem('rememberedEmail');
+    const storedRememberMe = localStorage.getItem('rememberMe');
+    if (storedEmail && storedRememberMe) {
+      setValues((prevValues) => ({
+        ...prevValues,
+        email: storedEmail
+      }));
+      setRememberMe(storedRememberMe === 'true');
+    }
+  }, []);
+
   const handleChange = prop => event => {
     setValues({ ...values, [prop]: event.target.value })
+  }
+
+  const handleRememberMeChange = (event) => {
+    setRememberMe(event.target.checked);
   }
 
   const handleClickShowPassword = () => {
@@ -80,6 +99,20 @@ const LoginPage = () => {
     event.preventDefault()
   }
 
+  const handleSubmit = (e) => {
+    e.preventDefault();
+    // Save email and "Remember Me" state to local storage if "Remember Me" is checked
+    if (rememberMe) {
+      localStorage.setItem('rememberedEmail', values.email);
+      localStorage.setItem('rememberMe', rememberMe);
+    } else {
+      localStorage.removeItem('rememberedEmail');
+      localStorage.removeItem('rememberMe');
+    }
+    // Perform login logic and redirect
+    router.push('/');
+  }
+  
   return (
     <Box className='content-center'>
       <Card sx={{ zIndex: 1 }}>
